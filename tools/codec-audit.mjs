@@ -173,12 +173,21 @@ function layout(dir) {
   throw new Error(`${dir}: Zeyvola.app veya Zeyvola.exe yok`);
 }
 
-function lister() {
-  const bin = join(CACHE, 'ffmpeg-codecs');
-  const src = join(ROOT, 'tools', 'codec-audit', 'ffmpeg-codecs.c');
+/** zig: $ZIG, then tools/.cache/zig/zig(.exe) (tools/zig-fetch.mjs), then the one on PATH. */
+function findZig() {
+  if (process.env.ZIG) return process.env.ZIG;
+  for (const f of ['zig.exe', 'zig']) { const p = join(CACHE, 'zig', f); if (existsSync(p)) return p; }
+  return 'zig';
+}
+
+/** tools/codec-audit/ffmpeg-codecs.zig for one macOS architecture ('arm64' | 'x86_64'), built with zig. */
+function lister(arch) {
+  const bin = join(CACHE, `ffmpeg-codecs-${arch}`);
+  const src = join(ROOT, 'tools', 'codec-audit', 'ffmpeg-codecs.zig');
   if (!existsSync(bin) || statSync(bin).mtimeMs < statSync(src).mtimeMs) {
     mkdirSync(CACHE, { recursive: true });
-    execFileSync('clang', ['-O1', '-arch', 'arm64', '-arch', 'x86_64', '-o', bin, src]);
+    const target = `${arch === 'arm64' ? 'aarch64' : 'x86_64'}-macos`;
+    execFileSync(findZig(), ['build-exe', src, '-target', target, '-lc', '-O', 'small', '--cache-dir', join(CACHE, 'zig-local'), `-femit-bin=${bin}`]);
   }
   return bin;
 }
@@ -187,7 +196,7 @@ function lister() {
 export function ffmpegCodecs(dylib) {
   const archs = execFileSync('lipo', ['-archs', dylib], { encoding: 'utf8' }).trim().split(/\s+/);
   const a = archs.includes(process.arch === 'arm64' ? 'arm64' : 'x86_64') ? (process.arch === 'arm64' ? 'arm64' : 'x86_64') : archs[0];
-  return JSON.parse(execFileSync('arch', [`-${a}`, lister(), dylib], { encoding: 'utf8' }));
+  return JSON.parse(execFileSync('arch', [`-${a}`, lister(a), dylib], { encoding: 'utf8' }));
 }
 
 async function officialZipEntry(spec, entry) {
