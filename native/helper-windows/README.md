@@ -45,4 +45,6 @@ Programa üçüncü taraf hiçbir şey girmez:
 
 `tools/codec-audit.mjs`, paketteki `resources/bin/zeyvola-win.exe` dosyasının yalnızca bu DLL'lere bağlı olduğunu ve kodlayıcı olarak yalnızca `MFCreateSinkWriterFromURL` dışında kodlayıcı, klavye veya ağ işlevi içe aktarmadığını denetler.
 
+C sürümüyle performans karşılaştırması (hız, CPU, bellek, boyut): [docs/zig-port-performans.md](../../docs/zig-port-performans.md).
+
 **Durum:** Gerçek Windows'ta henüz test edilmedi.
