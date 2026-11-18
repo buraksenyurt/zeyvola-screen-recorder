@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Puts Zig (MIT; build tool only, never part of a package) into tools/.cache/zig, the place
-// apps/desktop/scripts/package.mjs and native/helper-windows/build.sh look first. Used to build
-// zeyvola-win.exe (docs/licenses/inventory.md: "Zig 0.17.0 ... ziglang.org resmi arşivi, SHA-256").
+// apps/desktop/scripts/package.mjs, native/helper-windows/build.sh and tools/codec-audit.mjs look
+// first. Used to build zeyvola-win.exe (and, on macOS, codec-audit's FFmpeg lister) (docs/licenses/inventory.md: "Zig 0.17.0 ... ziglang.org resmi arşivi, SHA-256").
 //
 //   node tools/zig-fetch.mjs            download (if not cached), verify, unpack; prints the zig path
 //   node tools/zig-fetch.mjs --check    verify the cached archive only, no download

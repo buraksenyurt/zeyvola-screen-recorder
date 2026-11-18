@@ -188,7 +188,7 @@ In-app test suites (temporary projects folder, synthetic camera and microphone; 
 
 Other notes:
 - `tests/real-capture/` records the real screen; it needs the Swift compiler and the macOS screen recording permission and is not part of `pnpm test` (see [tests/real-capture/README.md](tests/real-capture/README.md)).
-- `pnpm native:win` (Windows helper) needs the Zig compiler at `tools/.cache/zig/zig` or via `ZIG`; Zig is not in the repository.
+- `pnpm native:win` (Windows helper, written in Zig) needs Zig 0.17 at `tools/.cache/zig/zig` (`node tools/zig-fetch.mjs`) or via `ZIG`; Zig is not in the repository. `zig build test` in `native/helper-windows` runs the helper's unit tests. `tools/codec-audit.mjs` also builds its macOS FFmpeg lister with Zig.
 - The app makes no network requests, but some build and release tools do: `pnpm install` and the Electron download, `tools/ffmpeg-source.mjs` and `tools/electron-artifacts.mjs`.
 
 Structure:
@@ -378,7 +378,7 @@ Uygulama içi test takımları (geçici proje klasörü, sentetik kamera ve mikr
 
 Diğer notlar:
 - `tests/real-capture/` gerçek ekran kaydı yapar; Swift derleyicisi ve macOS ekran kaydı izni ister, `pnpm test`'e dahil değildir (bkz. [tests/real-capture/README.md](tests/real-capture/README.md)).
-- `pnpm native:win` (Windows yardımcısı) Zig derleyicisi ister: `tools/.cache/zig/zig` yolunda ya da `ZIG` ile. Zig depoda yoktur.
+- `pnpm native:win` (Zig ile yazılmış Windows yardımcısı) Zig 0.17 ister: `tools/.cache/zig/zig` yolunda (`node tools/zig-fetch.mjs`) ya da `ZIG` ile. Zig depoda yoktur. Yardımcının birim testleri: `native/helper-windows` içinde `zig build test`. `tools/codec-audit.mjs` de macOS'taki FFmpeg listeleyicisini Zig ile derler.
 - Uygulama ağ isteği yapmaz; ancak bazı derleme ve yayın araçları ağ ister: `pnpm install` ve Electron indirmesi, `tools/ffmpeg-source.mjs` ve `tools/electron-artifacts.mjs`.
 
 Yapı:

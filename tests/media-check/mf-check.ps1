@@ -13,7 +13,7 @@
 #
 # Nothing is installed or downloaded: the C# below is compiled by the .NET Framework that comes
 # with Windows (Add-Type). Media Foundation is called the way native/helper-windows does it:
-# through the COM method tables, in the order of native/helper-windows/win-api.h (Microsoft's
+# through the COM method tables, in the order of native/helper-windows/src/win.zig (Microsoft's
 # documentation and win32metadata). This file stays ASCII so Windows PowerShell 5.1 reads it.
 param(
   [string]$File,

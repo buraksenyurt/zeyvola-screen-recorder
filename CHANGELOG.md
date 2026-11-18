@@ -4,6 +4,11 @@ Bu dosya Zeyvola'nın sürümlerindeki önemli değişiklikleri listeler.
 
 *This file lists notable changes in each Zeyvola release.*
 
+## Yayımlanmamış / Unreleased
+
+### Değişiklikler / Changes
+- Windows yardımcısı (`zeyvola-win.exe`) ve codec denetiminin FFmpeg listeleyicisi C yerine Zig ile yazıldı; projede C kodu kalmadı. Yardımcının davranışı ve çıktısı değişmedi (tüm kiplerde C sürümüyle karşılaştırıldı). *The Windows helper (`zeyvola-win.exe`) and codec-audit's FFmpeg lister are now written in Zig instead of C; no C code is left in the project. The helper's behaviour and output are unchanged (compared with the C version in every mode).*
+
 ## 0.1.0 — 2026-11-13
 
 İlk sürüm. macOS (Apple Silicon ve Intel) ve Windows 10/11 x64. Windows'ta otomatik testler GitHub'ın Windows makinesinde geçti; uygulama gerçek bir Windows bilgisayarda kurulup kayıt yapılarak denendi. Her donanımda denenmedi.
