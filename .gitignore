@@ -11,6 +11,8 @@ native/audio-macos/.build/
 native/audio-macos/bin/
 native/helper-windows/bin/
 native/helper-windows/.build/
+.zig-cache/
+zig-out/
 .DS_Store
 apps/desktop/.dev-app/
 tests/real-capture/.build/
