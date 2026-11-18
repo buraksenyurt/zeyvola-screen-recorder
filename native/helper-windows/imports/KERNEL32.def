@@ -15,5 +15,3 @@ GetTickCount64
 ReadFile
 SetFilePointer
 WriteFile
-lstrcmpA
-lstrcmpW

@@ -21,7 +21,7 @@
 // macOS packages get an ad hoc signature, Windows ones none; distribution needs real signing.
 // The executable's version details name Zeyvola and its developer; the icon is still Electron's.
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -45,7 +45,7 @@ if (!['mp4', 'webm', 'webm-vp8'].includes(profile)) throw new Error('--profile m
 if (!['darwin', 'win32'].includes(platform)) throw new Error('--platform darwin | win32');
 if (!['arm64', 'x64'].includes(arch)) throw new Error('--arch arm64 | x64');
 // A macOS package needs macOS's own tools (ditto, PlistBuddy, codesign, lipo, swiftc). A Windows
-// package is made on macOS (helper cross-compiled with zig) or on Windows itself (GitHub
+// package is made on macOS (helper cross-compiled with zig build) or on Windows itself (GitHub
 // windows-latest: bsdtar from System32, zig from tools/.cache/zig or ZIG or PATH).
 if (platform === 'darwin' && process.platform !== 'darwin') throw new Error('macOS paketi yalnızca macOS üzerinde derlenir (ditto, codesign, PlistBuddy, lipo)');
 if (platform === 'win32' && !['darwin', 'win32'].includes(process.platform)) throw new Error('Windows paketi macOS ya da Windows üzerinde derlenir');
@@ -59,7 +59,7 @@ const sh = (cmd, args, opts = {}) => execFileSync(cmd, args, { stdio: 'inherit',
 function shipHelper(dir, name) {
   const built = join(root, 'native', dir, 'bin', name);
   if (!existsSync(built)) {
-    if (dir === 'helper-windows' && process.platform === 'win32') buildWindowsHelperOnWindows();
+    if (dir === 'helper-windows') buildWindowsHelper();
     else sh('bash', [join(root, 'native', dir, 'build.sh')]);
   }
   mkdirSync(join(resources, 'bin'), { recursive: true });
@@ -181,7 +181,7 @@ if (platform === 'darwin') {
   // no Microsoft terms. Whether WebGL2 and export work this way is untested on real Windows.
   if (process.argv.includes('--omit-d3dcompiler')) rmSync(join(out, 'd3dcompiler_47.dll.terms-pending'), { force: true });
   // One helper for mouse buttons (--input) and imported videos' AAC sound (--extract-audio,
-  // Media Foundation → WAV). Built with zig from native/helper-windows, no C runtime linked.
+  // Media Foundation → WAV). Built with zig build from native/helper-windows (Zig sources), no C runtime linked.
   shipHelper('helper-windows', 'zeyvola-win.exe');
 }
 rmSync(work, { recursive: true, force: true });
@@ -221,24 +221,11 @@ sh(process.execPath, [join(root, 'tools', 'codec-audit.mjs'), out, '--profile', 
 console.log(`Paket: ${out}`);
 
 /**
- * native/helper-windows/build.sh, step for step, for a Windows host (no POSIX shell needed; on
- * GitHub runners `bash` may resolve to the WSL launcher). Keep the two in step.
+ * native/helper-windows/build.sh without a POSIX shell (on GitHub runners `bash` may resolve to the
+ * WSL launcher): the steps themselves are in native/helper-windows/build.zig, on every host.
  */
-function buildWindowsHelperOnWindows() {
-  const dir = join(root, 'native', 'helper-windows');
-  const zig = findZig();
-  mkdirSync(join(dir, 'bin'), { recursive: true });
-  mkdirSync(join(dir, '.build'), { recursive: true });
-  const libs = readdirSync(join(dir, 'imports')).filter((f) => f.endsWith('.def')).sort().map((def) => {
-    const lib = join('.build', def.replace(/\.def$/, '.lib'));
-    sh(zig, ['dlltool', '-m', 'i386:x86-64', '-d', join('imports', def), '-l', lib], { cwd: dir });
-    return lib;
-  });
-  sh(zig, ['cc', '-target', 'x86_64-windows-gnu', '-O2', '-Wall', '-Wextra', '-Wno-unused-parameter',
-    '-nostdinc', '-nostdlib', '-fno-stack-protector', '-mno-stack-arg-probe', '-fno-builtin',
-    '-s', '-Wl,--entry=mainCRTStartup', '-Wl,--subsystem,console',
-    'zeyvola-win.c', 'zeyvola-win.rc', '-o', join('bin', 'zeyvola-win.exe'), ...libs], { cwd: dir });
-  for (const f of ['zeyvola-win.lib', 'zeyvola-win.pdb']) rmSync(join(dir, 'bin', f), { force: true });
+function buildWindowsHelper() {
+  sh(findZig(), ['build', '--prefix', '.'], { cwd: join(root, 'native', 'helper-windows') });
 }
 
 /** zig: $ZIG, then tools/.cache/zig/zig(.exe), then the one on PATH. */

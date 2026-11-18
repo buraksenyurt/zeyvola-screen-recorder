@@ -83,6 +83,14 @@ jobs:
           ZEYVOLA_ZIG_CACHE: ${{ env.electron_config_cache }}\zig
         run: node tools/zig-fetch.mjs
 
+      # Unit tests of the Windows helper's Zig code (parsing, JSON lines, WAV header); no Windows call.
+      - name: Yardımcı birim testleri / helper unit tests
+        id: helper_unit
+        if: steps.zig.outcome == 'success'
+        continue-on-error: true
+        working-directory: native/helper-windows
+        run: '& "$env:GITHUB_WORKSPACE/tools/.cache/zig/zig.exe" build test --summary all'
+
       # Packaging first: it builds the app and zeyvola-win.exe (pointer helper, Media Foundation audio),
       # which the development runs below then use too (native/helper-windows/bin).
       - name: Windows paketi / package
@@ -311,6 +319,7 @@ jobs:
             dev_ui=${{ steps.dev_ui.outcome }}
             dev_terms=${{ steps.dev_terms.outcome }}
             zig=${{ steps.zig.outcome }}
+            helper_unit=${{ steps.helper_unit.outcome }}
             package=${{ steps.package.outcome }}
             helper_probe=${{ steps.helper_probe.outcome }}
             dev_nohelper=${{ steps.dev_nohelper.outcome }}
